@@ -1,0 +1,10 @@
+// Prisma schema file for Neon PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+

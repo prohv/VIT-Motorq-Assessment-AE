@@ -1,0 +1,13 @@
+{
+  "name": "pro-t3",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "concurrently -k -p \"[{name}]\" -c \"cyan.bold,yellow.bold\" -n \"API,WEB\" \"bun --filter api dev\" \"bun --filter web dev\"",
+    "db:push": "bun --filter api db:push",
+    "db:seed": "bun --filter api db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
