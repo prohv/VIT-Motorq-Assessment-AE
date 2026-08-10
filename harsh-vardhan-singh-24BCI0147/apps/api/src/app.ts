@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { buildTrackActiveHandler } from "./controllers/trackActiveController";
 
 const app = express();
 
@@ -16,5 +17,8 @@ app.use(express.json());
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+
+// Track active building endpoint
+app.post("/api/track-active/build", buildTrackActiveHandler);
 
 export default app;
