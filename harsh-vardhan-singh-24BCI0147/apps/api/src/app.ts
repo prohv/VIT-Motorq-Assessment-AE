@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from "../../swagger-output.json";
 import { buildTrackActiveHandler } from "./controllers/trackActiveController";
 import { getActiveUsersCountHandler, getActiveUsersListHandler } from "./controllers/activeUsersController";
 
@@ -14,6 +16,9 @@ app.use(
   })
 );
 app.use(express.json());
+
+// Swagger docs
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
