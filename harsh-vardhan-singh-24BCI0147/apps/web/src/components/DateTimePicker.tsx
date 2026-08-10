@@ -52,8 +52,11 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
   };
 
   const selectDate = (day: number) => {
-    const date = new Date(viewDate.year, viewDate.month, day);
-    onChange(date.toISOString().split("T")[0]);
+    // Use UTC to avoid timezone issues
+    const y = viewDate.year;
+    const m = viewDate.month;
+    const formatted = `${y}-${String(m + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    onChange(formatted);
     setIsOpen(false);
   };
 

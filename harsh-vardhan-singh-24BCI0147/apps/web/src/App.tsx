@@ -48,26 +48,17 @@ export default function App() {
   const queryClient = useQueryClient();
   const [timeMode, setTimeMode] = useState<TimeMode>("range");
 
-  // Moment mode state
-  const [momentDate, setMomentDate] = useState(() => formatDate(new Date()));
-  const [momentTime, setMomentTime] = useState(() => {
-    const d = new Date();
-    return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-  });
+  // Moment mode state - default to June 15 2025
+  const [momentDate, setMomentDate] = useState("2025-06-15");
+  const [momentTime, setMomentTime] = useState("12:00");
 
-  // Range mode state
-  const [rangeStartDate, setRangeStartDate] = useState(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return formatDate(d);
-  });
+  // Range mode state - default to June 15 2025 (dataset date)
+  const [rangeStartDate, setRangeStartDate] = useState("2025-06-15");
   const [rangeStartTime, setRangeStartTime] = useState("00:00");
-  const [rangeEndDate, setRangeEndDate] = useState(() => formatDate(new Date()));
-  const [rangeEndTime, setRangeEndTime] = useState(() => {
-    const d = new Date();
-    return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-  });
+  const [rangeEndDate, setRangeEndDate] = useState("2025-06-15");
+  const [rangeEndTime, setRangeEndTime] = useState("23:59");
   const [timeRangeDisplay, setTimeRangeDisplay] = useState("");
+  const [refetchKey, setRefetchKey] = useState(0);
 
   // Calculate time range display
   useEffect(() => {
@@ -96,14 +87,14 @@ export default function App() {
 
   // Query for range mode
   const { data: rangeData, isLoading: rangeLoading } = useQuery({
-    queryKey: ["activeUsersRange", rangeStartDate, rangeStartTime, rangeEndDate, rangeEndTime],
+    queryKey: ["activeUsersRange", rangeStartDate, rangeStartTime, rangeEndDate, rangeEndTime, refetchKey],
     queryFn: () => getActiveUsersCount(toIsoString(rangeStartDate, rangeStartTime), toIsoString(rangeEndDate, rangeEndTime)),
     enabled: timeMode === "range" && !!(rangeStartDate && rangeEndDate),
   });
 
   // Query for moment mode
   const { data: momentData, isLoading: momentLoading } = useQuery({
-    queryKey: ["activeUsersAt", momentDate, momentTime],
+    queryKey: ["activeUsersAt", momentDate, momentTime, refetchKey],
     queryFn: () => getActiveUsersAt(toIsoString(momentDate, momentTime)),
     enabled: timeMode === "moment" && !!(momentDate && momentTime),
   });
@@ -117,29 +108,34 @@ export default function App() {
   });
 
   const handleRefresh = () => buildMutation.mutate(1000);
-  const handleApply = () => queryClient.invalidateQueries({ queryKey: ["activeUsers"] });
+  const handleApply = () => {
+    setRefetchKey((k) => k + 1);
+  };
 
   const activeCount = timeMode === "range" ? rangeData?.count : momentData?.count;
   const isLoading = timeMode === "range" ? rangeLoading : momentLoading;
 
-  // Breakdown queries
-  const { data: countryData } = useQuery({
-    queryKey: ["activeUsersByCountry", rangeStartDate, rangeStartTime, rangeEndDate, rangeEndTime],
+  // Breakdown queries with loading
+  const { data: countryData, isLoading: countryLoading } = useQuery({
+    queryKey: ["activeUsersByCountry", rangeStartDate, rangeStartTime, rangeEndDate, rangeEndTime, refetchKey],
     queryFn: () => getActiveUsersByCountry(toIsoString(rangeStartDate, rangeStartTime), toIsoString(rangeEndDate, rangeEndTime)),
     enabled: timeMode === "range" && !!(rangeStartDate && rangeEndDate),
   });
 
-  const { data: deviceData } = useQuery({
-    queryKey: ["activeUsersByDevice", rangeStartDate, rangeStartTime, rangeEndDate, rangeEndTime],
+  const { data: deviceData, isLoading: deviceLoading } = useQuery({
+    queryKey: ["activeUsersByDevice", rangeStartDate, rangeStartTime, rangeEndDate, rangeEndTime, refetchKey],
     queryFn: () => getActiveUsersByDevice(toIsoString(rangeStartDate, rangeStartTime), toIsoString(rangeEndDate, rangeEndTime)),
     enabled: timeMode === "range" && !!(rangeStartDate && rangeEndDate),
   });
 
-  const { data: videoData } = useQuery({
-    queryKey: ["activeUsersByVideo", rangeStartDate, rangeStartTime, rangeEndDate, rangeEndTime],
+  const { data: videoData, isLoading: videoLoading } = useQuery({
+    queryKey: ["activeUsersByVideo", rangeStartDate, rangeStartTime, rangeEndDate, rangeEndTime, refetchKey],
     queryFn: () => getActiveUsersByVideo(toIsoString(rangeStartDate, rangeStartTime), toIsoString(rangeEndDate, rangeEndTime)),
     enabled: timeMode === "range" && !!(rangeStartDate && rangeEndDate),
   });
+
+  // Overall loading state
+  const isAnyLoading = isLoading || countryLoading || deviceLoading || videoLoading;
 
   // Generate timeline data
   const generateTimelineData = () => {
@@ -178,7 +174,7 @@ export default function App() {
   })) ?? [];
 
   const videoChartData = videoData?.data?.slice(0, 5).map((d) => ({
-    name: d.video_id || d.video || "Unknown",
+    name: d.title || d.video_id || "Unknown",
     views: d.count,
   })) ?? [];
 
@@ -283,9 +279,17 @@ export default function App() {
           <div className="mt-6">
             <button
               onClick={handleApply}
-              className="btn-squircle bg-[#6bda0a] hover:bg-[#56b008] text-black px-8 py-3 font-semibold shadow-md"
+              disabled={isAnyLoading}
+              className="btn-squircle bg-[#6bda0a] hover:bg-[#56b008] text-black px-8 py-3 font-semibold shadow-md disabled:opacity-50 flex items-center gap-2"
             >
-              Apply Filter
+              {isAnyLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Apply Filter"
+              )}
             </button>
           </div>
         </div>
@@ -323,7 +327,11 @@ export default function App() {
           {/* By Country */}
           <div className="card-squircle bg-white p-4 min-h-[280px]">
             <h3 className="font-heading text-lg font-semibold text-black mb-4">By Country</h3>
-            {countryChartData.length > 0 ? (
+            {countryLoading ? (
+              <div className="flex items-center justify-center h-48">
+                <div className="w-8 h-8 border-3 border-[#6bda0a] border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : countryChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={countryChartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -341,7 +349,11 @@ export default function App() {
           {/* By Device */}
           <div className="card-squircle bg-white p-4 min-h-[280px]">
             <h3 className="font-heading text-lg font-semibold text-black mb-4">By Device</h3>
-            {deviceChartData.length > 0 ? (
+            {deviceLoading ? (
+              <div className="flex items-center justify-center h-48">
+                <div className="w-8 h-8 border-3 border-[#6bda0a] border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : deviceChartData.length > 0 ? (
               <>
                 <ResponsiveContainer width="100%" height={240}>
                   <PieChart>
@@ -370,7 +382,11 @@ export default function App() {
           {/* By Video */}
           <div className="card-squircle bg-white p-4 min-h-[280px]">
             <h3 className="font-heading text-lg font-semibold text-black mb-4">By Video</h3>
-            {videoChartData.length > 0 ? (
+            {videoLoading ? (
+              <div className="flex items-center justify-center h-48">
+                <div className="w-8 h-8 border-3 border-[#6bda0a] border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : videoChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={videoChartData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

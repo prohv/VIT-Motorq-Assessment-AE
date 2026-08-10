@@ -42,3 +42,30 @@ model track_active {
 
   @@id([user_id, timestamp])
 }
+
+// Pre-aggregated hourly counts for O(1) prefix sum queries
+model hourly_user_counts {
+  hour        DateTime @db.Timestamptz  // truncated to hour
+  country     String
+  device      String
+  category    String
+  unique_users BigInt
+
+  @@id([hour, country, device, category])
+  @@index([hour])
+}
+
+// Precomputed prefix sums for fast range queries
+// prefix_sum[hour] = total unique users from start up to that hour
+model prefix_sum_table {
+  hour             DateTime @db.Timestamptz
+  country          String
+  device           String
+  category         String
+  cumulative_users BigInt
+  slot_index       Int  // position in the sorted hour sequence per dimension
+
+  @@id([hour, country, device, category])
+  @@index([country, device, category, hour])
+  @@index([hour])
+}
