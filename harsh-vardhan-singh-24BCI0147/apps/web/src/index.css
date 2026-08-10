@@ -1,2 +1,108 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@theme {
+  --color-primary: #6bda0a;
+  --color-primary-light: #8fe43a;
+  --color-primary-dark: #56b008;
+  --color-background: #ffffff;
+  --color-surface: #f5f5f5;
+  --color-foreground: #000000;
+  --color-muted: #737373;
+  --font-sans: 'Manrope', sans-serif;
+  --font-heading: 'DM Sans', sans-serif;
+}
+
+@layer base {
+  :root {
+    --p: 101 78% 50%;
+    --pf: 101 78% 40%;
+    --pc: 0 0% 100%;
+    --a: 101 78% 50%;
+    --af: 101 78% 40%;
+    --ac: 0 0% 100%;
+    --n: 0 0% 0%;
+    --nf: 0 0% 10%;
+    --nc: 0 0% 100%;
+    --b1: 0 0% 100%;
+    --b2: 0 0% 98%;
+    --b3: 0 0% 96%;
+    --in: 0 0% 0%;
+    --su: 101 78% 50%;
+    --wa: 45 93% 48%;
+    --er: 0 72% 51%;
+    --rounded-box: 1rem;
+    --rounded-btn: 0.75rem;
+    --rounded-badge: 1.9rem;
+    --animation-btn: 0.25s;
+    --animation-input: 0.2s;
+    --btn-focus-scale: 0.98;
+    --border-btn: 1px;
+    --tab-border: 1px;
+    --tab-radius: 0.75rem;
+  }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-paragraph {
+  font-family: var(--font-sans);
+}
+
+/* Squircle - soft rounded corners for modern SaaS look */
+.squircle {
+  border-radius: 22px;
+}
+
+.squircle-sm {
+  border-radius: 14px;
+}
+
+.squircle-lg {
+  border-radius: 32px;
+}
+
+.squircle-pill {
+  border-radius: 9999px;
+}
+
+/* Apply squircle to cards and containers */
+.card-squircle {
+  border-radius: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.card-squircle:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Button squircle */
+.btn-squircle {
+  border-radius: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-squircle:active {
+  transform: scale(0.98);
+}
+
+/* Navbar squircle */
+.navbar-squircle {
+  border-radius: 24px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
