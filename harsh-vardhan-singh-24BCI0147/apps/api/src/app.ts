@@ -3,8 +3,9 @@ import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "../swagger-output.json";
 import { buildTrackActiveHandler } from "./controllers/trackActiveController";
-import { getActiveUsersCountHandler, getActiveUsersListHandler } from "./controllers/activeUsersController";
+import { getActiveUsersCountHandler } from "./controllers/activeUsersController";
 import { getActiveAtTimestampHandler } from "./controllers/activeAtTimestampController";
+import { getActiveUsersByCountryHandler, getActiveUsersByDeviceHandler, getActiveUsersByVideoHandler } from "./controllers/breakdownController";
 
 const app = express();
 
@@ -30,9 +31,13 @@ app.post("/api/track-active/build", buildTrackActiveHandler);
 
 // Active users endpoints
 app.get("/api/active-users/count", getActiveUsersCountHandler);
-app.get("/api/active-users", getActiveUsersListHandler);
 
 // Active at specific timestamp
 app.get("/api/active-users/at", getActiveAtTimestampHandler);
+
+// Breakdown endpoints
+app.get("/api/active-users/by-country", getActiveUsersByCountryHandler);
+app.get("/api/active-users/by-device", getActiveUsersByDeviceHandler);
+app.get("/api/active-users/by-video", getActiveUsersByVideoHandler);
 
 export default app;

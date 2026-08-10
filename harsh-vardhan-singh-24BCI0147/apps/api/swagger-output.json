@@ -73,7 +73,32 @@
         }
       }
     },
-    "/api/active-users": {
+    "/api/active-users/at": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "x",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/active-users/by-country": {
       "get": {
         "description": "",
         "parameters": [
@@ -105,12 +130,51 @@
         }
       }
     },
-    "/api/active-users/at": {
+    "/api/active-users/by-device": {
       "get": {
         "description": "",
         "parameters": [
           {
-            "name": "x",
+            "name": "start",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/active-users/by-video": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end",
             "in": "query",
             "schema": {
               "type": "string"
