@@ -149,10 +149,14 @@ Count users active at a specific timestamp.
 
 ### Breakdowns
 
+#### By Country
 ```
-GET /api/active-users/by-country?start=...&end=...
+GET /api/active-users/by-country?start=2025-06-15T00:00:00&end=2025-06-15T23:59:59
 ```
 
+Returns user count per country. Uses `track_active` table joined with `events` to get user's country.
+
+**Response:**
 ```json
 {
   "data": [
@@ -163,10 +167,14 @@ GET /api/active-users/by-country?start=...&end=...
 }
 ```
 
+#### By Device
 ```
 GET /api/active-users/by-device?start=...&end=...
 ```
 
+Returns user count per device type (desktop, mobile, smart_tv, tablet).
+
+**Response:**
 ```json
 {
   "data": [
@@ -178,10 +186,14 @@ GET /api/active-users/by-device?start=...&end=...
 }
 ```
 
+#### By Video
 ```
 GET /api/active-users/by-video?start=...&end=...
 ```
 
+Returns user count per video, includes video title from `content` table.
+
+**Response:**
 ```json
 {
   "data": [
@@ -190,6 +202,21 @@ GET /api/active-users/by-video?start=...&end=...
   ]
 }
 ```
+
+### Prefix Sum Optimization
+
+The `prefix_sum_table` provides O(1) range lookups for concurrency analytics:
+
+- **Table**: Stores cumulative user counts per timestamp
+- **Query**: `result = prefix[end] - prefix[start-1]`
+- **Benefits**: Fast queries for any time range without scanning all events
+
+Rebuild prefix sums:
+```
+POST /api/prefix-sum/rebuild
+```
+
+This aggregates hourly data and builds cumulative sums for efficient range queries.
 
 ## Database Schema
 
