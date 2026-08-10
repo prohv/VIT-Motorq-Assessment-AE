@@ -14,28 +14,28 @@ function parseCSV(content: string) {
   });
 }
 
-async function seedEvents() {
-  const eventsPath = resolve(__dirname, "../../../../data/events.csv");
-  console.log("Reading from:", eventsPath);
-  const data = parseCSV(readFileSync(eventsPath, "utf-8"));
-  console.log(`Seeding ${data.length} events...`);
-
-  for (const row of data) {
-    await prisma.events.create({
-      data: {
-        event_id: row.event_id,
-        session_id: row.session_id,
-        user_id: row.user_id,
-        video_id: row.video_id,
-        timestamp: new Date(row.timestamp),
-        event_type: row.event_type,
-        device: row.device,
-        country: row.country,
-      },
-    });
-  }
-  console.log(`Seeded ${data.length} events`);
-}
+// async function seedEvents() {
+//   const eventsPath = resolve(__dirname, "../../../../data/events.csv");
+//   console.log("Reading from:", eventsPath);
+//   const data = parseCSV(readFileSync(eventsPath, "utf-8"));
+//   console.log(`Seeding ${data.length} events...`);
+//
+//   for (const row of data) {
+//     await prisma.events.create({
+//       data: {
+//         event_id: row.event_id,
+//         session_id: row.session_id,
+//         user_id: row.user_id,
+//         video_id: row.video_id,
+//         timestamp: new Date(row.timestamp),
+//         event_type: row.event_type,
+//         device: row.device,
+//         country: row.country,
+//       },
+//     });
+//   }
+//   console.log(`Seeded ${data.length} events`);
+// }
 
 async function seedContent() {
   const contentPath = resolve(__dirname, "../../../../data/content.csv");
@@ -58,7 +58,7 @@ async function seedContent() {
 
 async function main() {
   console.log("Seeding database...");
-  await seedEvents();
+  // await seedEvents();
   await seedContent();
   console.log("Done!");
 }
