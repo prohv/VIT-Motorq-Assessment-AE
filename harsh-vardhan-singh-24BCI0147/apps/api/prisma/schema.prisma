@@ -6,5 +6,40 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
+model events {
+  event_id String @id @db.Uuid
+  session_id String @db.Uuid
+  user_id String @db.Uuid
+  video_id String @db.Uuid
+  timestamp DateTime
+  event_type EventType
+  device String
+  country String
+}
+
+enum EventType{
+  SESSION_START
+  PLAY
+  HEARTBEAT
+  PAUSE
+  SESSION_END
+}
+
+model content {
+  video_id String @id @db.Uuid
+  title String
+  category String
+  language String
+}
+
+model track_active {
+  user_id String @db.Uuid
+  timestamp DateTime
+  event_type EventType
+  active Boolean
+
+  @@id([user_id, timestamp])
+}
