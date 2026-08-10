@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { buildTrackActiveHandler } from "./controllers/trackActiveController";
+import { getActiveUsersCountHandler, getActiveUsersListHandler } from "./controllers/activeUsersController";
 
 const app = express();
 
@@ -20,5 +21,9 @@ app.get("/api/health", (req, res) => {
 
 // Track active building endpoint
 app.post("/api/track-active/build", buildTrackActiveHandler);
+
+// Active users endpoints
+app.get("/api/active-users/count", getActiveUsersCountHandler);
+app.get("/api/active-users", getActiveUsersListHandler);
 
 export default app;
