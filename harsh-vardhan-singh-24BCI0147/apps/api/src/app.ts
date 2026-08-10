@@ -1,9 +1,10 @@
 import express from "express";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
-import swaggerDocument from "../../swagger-output.json";
+import swaggerDocument from "../swagger-output.json";
 import { buildTrackActiveHandler } from "./controllers/trackActiveController";
 import { getActiveUsersCountHandler, getActiveUsersListHandler } from "./controllers/activeUsersController";
+import { getActiveAtTimestampHandler } from "./controllers/activeAtTimestampController";
 
 const app = express();
 
@@ -30,5 +31,8 @@ app.post("/api/track-active/build", buildTrackActiveHandler);
 // Active users endpoints
 app.get("/api/active-users/count", getActiveUsersCountHandler);
 app.get("/api/active-users", getActiveUsersListHandler);
+
+// Active at specific timestamp
+app.get("/api/active-users/at", getActiveAtTimestampHandler);
 
 export default app;
